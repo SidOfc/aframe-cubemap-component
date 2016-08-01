@@ -1,13 +1,15 @@
-## aframe-cubemap-component
+## (forked) aframe-cubemap-component
 
 An [A-Frame](https://aframe.io) component for creating a skybox from a cubemap.
+Original extension by [Ben Pyrik](https://github.com/bryik)
 
 ### Properties
 
-|  Property  |               Description               | Default Value |
-|:----------:|:---------------------------------------:|:-------------:|
-|   folder   | Path to the folder holding your cubemap |      none     |
-| edgeLength |  Controls the dimensions of the skybox  |      5000     |
+|  Property  |                 Description                 | Default Value |
+|:----------:|:-------------------------------------------:|:-------------:|
+|   folder   |   Path to the folder holding your cubemap   |      none     |
+| edgeLength |    Controls the dimensions of the skybox    |      5000     |
+|  nameMap   | Alias default name scheme to fit your needs |      none     |
 
 By default, the height, width, and depth of the skybox are set to 5000. In other words, the dimensions of the skybox are 5000x5000x5000.
 
@@ -29,7 +31,12 @@ Inside the folder, the component assumes the following naming scheme:
   ];
 ```
 
-This is the scheme used by Three.js's [CubeTexture](http://threejs.org/docs/index.html#Reference/Textures/CubeTexture). If your cubemap images do not follow this scheme, you will need to rename them (or fork this repo and alter the above in index.js).
+This is the scheme used by Three.js's [CubeTexture](http://threejs.org/docs/index.html#Reference/Textures/CubeTexture).
+If your cubemap images do not follow this scheme, you can use the `nameMap` attribute like so (if your images were named according to sides of a cube e.g. `left`, `front` etc...):
+
+```html
+  <a-entity cubemap="folder: /assets/Yokohama3/; nameMap: negx=left posx=right negy=down posy=up negz=back posz=front"></a-entity>
+```
 
 The Yokohama cubemap texture is the work of [Emil Persson, aka Humus](http://www.humus.name). Check out his website, it is a good source for [cubemap textures](http://www.humus.name/index.php?page=Textures).
 
@@ -56,5 +63,3 @@ Install and use by directly including the [browser files](dist):
   </a-scene>
 </body>
 ```
-
-

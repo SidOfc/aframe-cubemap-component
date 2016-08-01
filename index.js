@@ -14,58 +14,79 @@ AFRAME.registerComponent('cubemap', {
     edgeLength: {
       type: 'int',
       default: 5000
-    }
+    },
+		nameMap: {
+			type: 'string'
+		}
   },
 
   /**
    * Called once when component is attached. Generally for initial setup.
    */
   init: function () {
-    // entity data
-    var el = this.el;
-    var data = this.data;
+	    // entity data
+	    var el = this.el;
+	    var data = this.data;
 
-    // Path to the folder containing the 6 cubemap images
-    var srcPath = data.folder;
+	    // Path to the folder containing the 6 cubemap images
+	    var srcPath = data.folder;
+			var img;
+			var urls = [];
 
-    // Cubemap image files must follow this naming scheme
-    // from: http://threejs.org/docs/index.html#Reference/Textures/CubeTexture
-    var urls = [
-      'posx.jpg', 'negx.jpg',
-      'posy.jpg', 'negy.jpg',
-      'posz.jpg', 'negz.jpg'
-    ];
+			// Set expected cubemap image order
+			var cube_order = ['posx', 'negx', 'posy', 'negy', 'posz', 'negz'];
 
-    // Code that follows is adapted from "Skybox and environment map in Three.js" by Roman Liutikov
-    // http://blog.romanliutikov.com/post/58705840698/skybox-and-environment-map-in-threejs
+			// default placeholders for backward compatibility
+			var placeholders = {
+				posx: 'posx', negx: 'negx',
+				posy: 'posy', negy: 'negy',
+				posz: 'posz', negz: 'negz'
+			};
 
-    // Create loader, set folder path, and load cubemap textures
-    var loader = new THREE.CubeTextureLoader();
-    loader.setPath(srcPath);
+			if (data.nameMap) {
+				// convert the nameMap string into an object
+				name_map_array = data.nameMap.split(' ');
+				for (var i = 0, j = name_map_array.length; i < j; i++) {
+					name_map = name_map_array[i].split('=');
+					placeholders[name_map[0]] = name_map[1];
+				}
+			}
 
-    var cubemap = loader.load(urls);
-    cubemap.format = THREE.RGBFormat;
+			// Fill urls using placeholders which will be used instead of the static defaults
+			for (var ii = 0, jj = cube_order.length; ii < jj; ii++) {
+				urls[ii] = placeholders[cube_order[ii]] + ".jpg";
+			}
 
-    var shader = THREE.ShaderLib['cube']; // init cube shader from built-in lib
+	    // Code that follows is adapted from "Skybox and environment map in Three.js" by Roman Liutikov
+	    // http://blog.romanliutikov.com/post/58705840698/skybox-and-environment-map-in-threejs
 
-    // Create shader material
-    var skyBoxShader = new THREE.ShaderMaterial({
-      fragmentShader: shader.fragmentShader,
-      vertexShader: shader.vertexShader,
-      uniforms: shader.uniforms,
-      depthWrite: false,
-      side: THREE.BackSide
-    });
+	    // Create loader, set folder path, and load cubemap textures
+	    var loader = new THREE.CubeTextureLoader();
+	    loader.setPath(srcPath);
 
-    // Clone ShaderMaterial (necessary for multiple cubemaps)
-    var skyBoxMaterial = skyBoxShader.clone();
-    skyBoxMaterial.uniforms['tCube'].value = cubemap; // Apply cubemap textures to shader uniforms
+	    var cubemap = loader.load(urls);
+	    cubemap.format = THREE.RGBFormat;
 
-    // Set skybox dimensions
-    var edgeLength = data.edgeLength;
-    var skyBoxGeometry = new THREE.CubeGeometry(edgeLength, edgeLength, edgeLength);
+	    var shader = THREE.ShaderLib['cube']; // init cube shader from built-in lib
 
-    // Set entity's object3D
-    el.setObject3D('mesh', new THREE.Mesh(skyBoxGeometry, skyBoxMaterial));
+	    // Create shader material
+	    var skyBoxShader = new THREE.ShaderMaterial({
+	      fragmentShader: shader.fragmentShader,
+	      vertexShader: shader.vertexShader,
+	      uniforms: shader.uniforms,
+	      depthWrite: false,
+	      side: THREE.BackSide
+	    });
+
+	    // Clone ShaderMaterial (necessary for multiple cubemaps)
+	    var skyBoxMaterial = skyBoxShader.clone();
+	    skyBoxMaterial.uniforms['tCube'].value = cubemap; // Apply cubemap textures to shader uniforms
+
+	    // Set skybox dimensions
+	    var edgeLength = data.edgeLength;
+	    var skyBoxGeometry = new THREE.CubeGeometry(edgeLength, edgeLength, edgeLength);
+
+	    // Set entity's object3D
+	    el.setObject3D('mesh', new THREE.Mesh(skyBoxGeometry, skyBoxMaterial));
   }
 });
