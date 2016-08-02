@@ -3,6 +3,8 @@
 An [A-Frame](https://aframe.io) component for creating a skybox from a cubemap.
 Original extension by [Ben Pyrik](https://github.com/bryik)
 
+Adds the ability to deviate from the standard naming scheme used (`nameMap`) and sends CORS headers by default, (there is no way to do this outside of the library)
+
 ### Properties
 
 |  Property  |                 Description                 | Default Value |
