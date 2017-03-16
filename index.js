@@ -21,27 +21,13 @@ AFRAME.registerComponent('cubemap', {
   },
 
   /**
-   * Called once when component is attached. Generally for initial setup.
+   * Called when component is attached and when component data changes.
+   * Generally modifies the entity based on the data.
    */
-  init: function () {
-	    // entity data
-	    var el = this.el;
-	    var data = this.data;
-
-	    // Path to the folder containing the 6 cubemap images
-	    var srcPath = data.folder;
-			var img;
-			var urls = [];
-
-			// Set expected cubemap image order
-			var cube_order = ['posx', 'negx', 'posy', 'negy', 'posz', 'negz'];
-
-			// default placeholders for backward compatibility
-			var placeholders = {
-				posx: 'posx', negx: 'negx',
-				posy: 'posy', negy: 'negy',
-				posz: 'posz', negz: 'negz'
-			};
+  update: function (oldData) {
+    // entity data
+    var el = this.el;
+    var data = this.data;
 
 			if (data.nameMap) {
 				// convert the nameMap string into an object
@@ -86,7 +72,15 @@ AFRAME.registerComponent('cubemap', {
 	    var edgeLength = data.edgeLength;
 	    var skyBoxGeometry = new THREE.CubeGeometry(edgeLength, edgeLength, edgeLength);
 
-	    // Set entity's object3D
-	    el.setObject3D('mesh', new THREE.Mesh(skyBoxGeometry, skyBoxMaterial));
+    // Set entity's object3D
+    el.setObject3D('cubemap', new THREE.Mesh(skyBoxGeometry, skyBoxMaterial));
+  },
+
+  /**
+   * Called when a component is removed (e.g., via removeAttribute).
+   * Generally undoes all modifications to the entity.
+   */
+  remove: function () {
+    this.el.removeObject3D('cubemap');
   }
 });
